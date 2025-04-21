@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# .git/hooks/prepare-commit-msg
+
+MSG_FILE=$1
+SOURCE=$2
+
+# 1) 머지/스쿼시 커밋은 건너뛰기
+if [[ "$SOURCE" == "merge" || "$SOURCE" == "squash" ]]; then
+exit 0
+fi
+
+# 2) 첫 줄 읽기
+FIRST_LINE=$(head -n1 "$MSG_FILE")
+
+# 3) 키워드 매핑
+emoji=""
+new="${FIRST_LINE}"
+
+if [[ "$FIRST_LINE" =~ ^init: ]]; then
+emoji="🎉"
+new="${FIRST_LINE#init:}"
+
+elif [[ "$FIRST_LINE" =~ ^feat: ]]; then
+emoji="✨"
+new="${FIRST_LINE#feat:}"
+
+elif [[ "$FIRST_LINE" =~ ^refactor: ]]; then
+emoji="♻️"
+new="${FIRST_LINE#refactor:}"
+
+elif [[ "$FIRST_LINE" =~ ^fix: ]]; then
+emoji="🔧"
+new="${FIRST_LINE#fix:}"
+
+elif [[ "$FIRST_LINE" =~ ^style: ]]; then
+emoji="💄"
+new="${FIRST_LINE#style:}"
+
+elif [[ "$FIRST_LINE" =~ ^docs: ]]; then
+emoji="📝"
+new="${FIRST_LINE#docs:}"
+
+elif [[ "$FIRST_LINE" =~ ^build: ]]; then
+emoji="🏗️"
+new="${FIRST_LINE#build:}"
+
+else
+# 매칭되는 키워드가 없으면 종료
+exit 0
+fi
+
+# 5) 메시지 앞뒤 공백 정리
+trimmed="$(echo "$new" | sed -E 's/^[[:space:]]+//;s/[[:space:]]+$//')"
+
+# 6) 파일 첫 줄을 이모지 + 내용으로 교체
+sed -i "1s~.*~$emoji $trimmed~" "$MSG_FILE"
