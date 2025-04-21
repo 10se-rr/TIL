@@ -7,4 +7,3 @@
 
 ## Git
 - [Git hook 사용하기](./git/Git-hook-사용하기.md)
-- [Git hook 커밋이모지](./git/Git-hook-커밋이모지.md)
